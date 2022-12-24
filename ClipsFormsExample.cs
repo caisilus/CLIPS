@@ -89,17 +89,8 @@ namespace ClipsFormsExample
             }
 
             string factName = inputFactsBox.Text;
-            try
-            {
-                Fact fact = _productionSystem.NamesToFacts[factName];
-                Console.WriteLine(fact);
-                chosenInputsFactsBox.Text += factName;
-                chosenInputsFactsBox.Text += Environment.NewLine;
-            }
-            catch (KeyNotFoundException keyNotFoundException)
-            {
-                Console.WriteLine($"Cannot find key: {factName}");
-            }
+            chosenInputsFactsBox.Text += factName;
+            chosenInputsFactsBox.Text += Environment.NewLine;
         }
 
         private void nextBtn_Click(object sender, EventArgs e)
@@ -113,7 +104,7 @@ namespace ClipsFormsExample
                     Console.WriteLine(slot.Contents);
                 }
             }
-            _clips.Run();
+            _clips.Run(1);
             Console.WriteLine("Run ended");
             foreach (var fact in _clips.GetFactList())
             {
@@ -128,8 +119,9 @@ namespace ClipsFormsExample
 
         private void resetBtn_Click(object sender, EventArgs e)
         {
-            outputBox.Text = "Выполнены команды Clear и Reset." + System.Environment.NewLine;
-            //_clips.Clear();
+            outputBox.Text = "Выполнена команда Reset." + System.Environment.NewLine;
+            
+            _clips.Reset();
 
             foreach (string factLine in chosenInputsFactsBox.Text.Split('\n').
                                                                   Select(fline => fline.Trim()).
@@ -141,10 +133,6 @@ namespace ClipsFormsExample
                 Console.WriteLine(clipsString);
                 _clips.Eval(fact.ToClipsConsequence());
             }
-            
-            //_clips.LoadFromString(inputFactsBox.Text);
-
-            _clips.Reset();
         }
 
         private void openFile_Click(object sender, EventArgs e)
