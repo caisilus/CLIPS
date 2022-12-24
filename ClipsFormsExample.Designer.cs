@@ -330,7 +330,7 @@ namespace ClipsFormsExample
             this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MinimumSize = new System.Drawing.Size(874, 358);
             this.Name = "ClipsFormsExample";
-            this.Text = "Экспертная система \"Тиндер\"";
+            this.Text = "Экспертная система \"HM&M-5\"";
             this.panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();

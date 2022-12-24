@@ -55,44 +55,7 @@ namespace ClipsFormsExample
         {
             _autoCompleteCollection.AddRange(factNames);
         }
-
-        private void HandleResponse()
-        {
-            //  Вытаскиаваем факт из ЭС
-            String evalStr = "(find-fact ((?f ioproxy)) TRUE)";
-            FactAddressValue fv = (FactAddressValue)((MultifieldValue)_clips.Eval(evalStr))[0];
-
-            MultifieldValue damf = (MultifieldValue)fv["messages"];
-            MultifieldValue vamf = (MultifieldValue)fv["answers"];
-
-            outputBox.Text += "Новая итерация : " + System.Environment.NewLine;
-            for (int i = 0; i < damf.Count; i++)
-            {
-                LexemeValue da = (LexemeValue)damf[i];
-                byte[] bytes = Encoding.Default.GetBytes(da.Value);
-                string message = Encoding.UTF8.GetString(bytes);
-                outputBox.Text += message + System.Environment.NewLine;
-            }
-
-            var phrases = new List<string>();
-            if (vamf.Count > 0)
-            {
-                outputBox.Text += "----------------------------------------------------" + System.Environment.NewLine;
-                for (int i = 0; i < vamf.Count; i++)
-                {
-                    //  Варианты !!!!!
-                    LexemeValue va = (LexemeValue)vamf[i];
-                    byte[] bytes = Encoding.Default.GetBytes(va.Value);
-                    string message = Encoding.UTF8.GetString(bytes);
-                    phrases.Add(message);
-                    outputBox.Text += "Добавлен вариант для распознавания " + message + System.Environment.NewLine;
-                }
-            }
-            
-            if(vamf.Count == 0)
-                _clips.Eval("(assert (clearmessage))");
-        }
-
+        
         private void inputFactsBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter)
@@ -121,7 +84,6 @@ namespace ClipsFormsExample
         {
             _clips.Run();
             UpdateOutput();
-            //HandleResponse();
         }
 
         private void UpdateOutput()
