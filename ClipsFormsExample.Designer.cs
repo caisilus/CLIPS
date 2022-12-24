@@ -209,6 +209,8 @@ namespace ClipsFormsExample
             this.goalFactBox.AutoCompleteCustomSource = _autoCompleteCollection;
             this.goalFactBox.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             this.goalFactBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+
+            this.goalFactBox.KeyDown += goalFactsBox_KeyDown;
             
             // 
             // chosenGoalsFactBox

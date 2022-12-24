@@ -20,6 +20,7 @@ namespace ClipsFormsExample
     {
         private readonly CLIPSNET.Environment _clips = new CLIPSNET.Environment();
         private ProductionSystem.ProductionSystem _productionSystem;
+        private List<Fact> _goals;
         public ClipsFormsExample()
         {
             InitProductionSystem();
@@ -103,6 +104,18 @@ namespace ClipsFormsExample
             chosenInputsFactsBox.Text += factName;
             chosenInputsFactsBox.Text += Environment.NewLine;
         }
+        
+        private void goalFactsBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter)
+            {
+                return;
+            }
+
+            string factName = goalFactBox.Text;
+            chosenGoalsFactBox.Text += factName;
+            chosenGoalsFactBox.Text += Environment.NewLine;
+        }
 
         private void nextBtn_Click(object sender, EventArgs e)
         {
@@ -114,25 +127,39 @@ namespace ClipsFormsExample
         private void UpdateOutput()
         {
             List<Rule> usedRules = new List<Rule>();
-            foreach (var fact in _clips.GetFactList())
+            HashSet<Fact> deducedFacts = new HashSet<Fact>();
+            foreach (var factInstance in _clips.GetFactList())
             {
-                var factDict = ClipsFactToDictionary(fact);
-                switch (fact.RelationName)
+                var factDict = ClipsFactToDictionary(factInstance);
+                switch (factInstance.RelationName)
                 {
                     case "fact_entity":
-                        Console.WriteLine(factDict["name"]);
-                        break;
+                    {
+                        Fact fact = _productionSystem.IdsToFacts[factDict["id"]];
+                        deducedFacts.Add(fact);
+                        break;   
+                    }
                     case "used_rule":
                     {
-                        Console.WriteLine("rule id: "+factDict["rule_id"]);
-                        var rule = _productionSystem.IdsToRules[factDict["rule_id"].Trim()];
+                        Rule rule = _productionSystem.IdsToRules[factDict["rule_id"].Trim()];
                         usedRules.Add(rule);
                         break;
                     }
                 }
             }
 
-            outputBox.Text = "ИСПОЛЬЗОВАННЫЕ ПРАВИЛА:" + Environment.NewLine;
+            bool reachedGoals = _goals.All(goal => deducedFacts.Contains(goal));
+            if (reachedGoals)
+            {
+                outputBox.Text = "ЦЕЛИ ДОСТИГНУТЫ" + Environment.NewLine + "------------------------------";
+            }
+            else
+            {
+                outputBox.Text = "НЕВОЗМОЖНО ВЫВЕСТИ" + Environment.NewLine + "------------------------------";
+            }
+
+            outputBox.Text += Environment.NewLine;
+            outputBox.Text += "ИСПОЛЬЗОВАННЫЕ ПРАВИЛА:" + Environment.NewLine;
             outputBox.Text += Environment.NewLine + 
                               string.Join(Environment.NewLine + Environment.NewLine, usedRules);
         }
@@ -153,18 +180,34 @@ namespace ClipsFormsExample
             outputBox.Text = "Выполнена команда Reset." + System.Environment.NewLine;
             
             _clips.Reset();
-
-            //_clips.Eval("(assert (used_rule (rule_id dummy)))");
             
+            LoadStartingFacts();
+            UpdateGoals();
+        }
+
+        private void LoadStartingFacts()
+        {
             foreach (string factLine in chosenInputsFactsBox.Text.Split('\n').
-                                                                  Select(fline => fline.Trim()).
-                                                                  Where(fline => !string.IsNullOrEmpty(fline)))
+                Select(line => line.Trim()).
+                Where(line => !string.IsNullOrEmpty(line)))
             {
                 Console.WriteLine(factLine);
                 Fact fact = _productionSystem.NamesToFacts[factLine];
                 var clipsString = fact.ToClipsConsequence();
                 Console.WriteLine(clipsString);
                 _clips.Eval(fact.ToClipsConsequence());
+            }
+        }
+
+        private void UpdateGoals()
+        {
+            _goals = new List<Fact>();
+            foreach (string factLine in chosenGoalsFactBox.Text.Split('\n').
+                Select(line => line.Trim()).
+                Where(line => !string.IsNullOrEmpty(line)))
+            {
+                Fact fact = _productionSystem.NamesToFacts[factLine];
+                _goals.Add(fact);
             }
         }
 
