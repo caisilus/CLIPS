@@ -137,6 +137,7 @@
   <ItemGroup>
     <Content Include="clips_files\fact_template.clp" />
     <Content Include="clips_files\rules.clp" />
+    <Content Include="clips_files\used_rule_template.clp" />
     <Content Include="storage\facts.txt" />
     <Content Include="storage\Facts_new.txt" />
     <Content Include="storage\Rules.txt" />

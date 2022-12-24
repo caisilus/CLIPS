@@ -12,36 +12,47 @@ using System.Windows.Forms;
 using CLIPSNET;
 using ProductionSystem;
 using Environment = System.Environment;
+using Rule = ProductionSystem.Rule;
 
 namespace ClipsFormsExample
 {
     public partial class ClipsFormsExample : Form
     {
         private readonly CLIPSNET.Environment _clips = new CLIPSNET.Environment();
-        private readonly ProductionSystem.ProductionSystem _productionSystem;
+        private ProductionSystem.ProductionSystem _productionSystem;
         public ClipsFormsExample()
+        {
+            InitProductionSystem();
+            
+            _autoCompleteCollection = new AutoCompleteStringCollection();
+            UpdateAutoCompleteCollection(_productionSystem.IdsToFacts.Values.Select(f=>f.Name).ToArray());
+            
+            File.WriteAllText("../../clips_files/rules.clp", _productionSystem.RulesToClipsText());
+            
+            InitClipsData();
+            
+            InitializeComponent();
+        }
+
+        void InitProductionSystem()
         {
             ProductionSystemFileLoader loader = new ProductionSystemFileLoader();
             string storageFolder = "../../storage/";
             string factsFile = storageFolder + "Facts_new.txt";
             string rulesFule = storageFolder + "Rules.txt";
             _productionSystem = loader.LoadFromFiles(factsFile, rulesFule);
-            _autoCompleteCollection = new AutoCompleteStringCollection();
-            UpdateAutoCompleteCollection(_productionSystem.IdsToFacts.Values.Select(f=>f.Name).ToArray());
+        }
+        
+        private void InitClipsData()
+        {
             _clips.Load("../../clips_files/fact_template.clp");
+            _clips.Load("../../clips_files/used_rule_template.clp");
             _clips.Load("../../clips_files/rules.clp");
-            //File.WriteAllText("../../clips_files/rules.clp", _productionSystem.RulesToClipsText());
-            InitializeComponent();
         }
 
         private void UpdateAutoCompleteCollection(string[] factNames)
         {
             _autoCompleteCollection.AddRange(factNames);
-        }
-        
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
         }
 
         private void HandleResponse()
@@ -95,34 +106,56 @@ namespace ClipsFormsExample
 
         private void nextBtn_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("Next clicked");
-            foreach (var fact in _clips.GetFactList())
-            {
-                foreach (var slot in fact.GetSlotValues())
-                {
-                    Console.WriteLine(slot.SlotName);
-                    Console.WriteLine(slot.Contents);
-                }
-            }
-            _clips.Run(1);
-            Console.WriteLine("Run ended");
-            foreach (var fact in _clips.GetFactList())
-            {
-                foreach (var slot in fact.GetSlotValues())
-                {
-                    Console.WriteLine(slot.SlotName);
-                    Console.WriteLine(slot.Contents);
-                }
-            }
+            _clips.Run();
+            UpdateOutput();
             //HandleResponse();
         }
 
+        private void UpdateOutput()
+        {
+            List<Rule> usedRules = new List<Rule>();
+            foreach (var fact in _clips.GetFactList())
+            {
+                var factDict = ClipsFactToDictionary(fact);
+                switch (fact.RelationName)
+                {
+                    case "fact_entity":
+                        Console.WriteLine(factDict["name"]);
+                        break;
+                    case "used_rule":
+                    {
+                        Console.WriteLine("rule id: "+factDict["rule_id"]);
+                        var rule = _productionSystem.IdsToRules[factDict["rule_id"].Trim()];
+                        usedRules.Add(rule);
+                        break;
+                    }
+                }
+            }
+
+            outputBox.Text = "ИСПОЛЬЗОВАННЫЕ ПРАВИЛА:" + Environment.NewLine;
+            outputBox.Text += Environment.NewLine + 
+                              string.Join(Environment.NewLine + Environment.NewLine, usedRules);
+        }
+
+        private Dictionary<string, string> ClipsFactToDictionary(FactInstance factInstance)
+        {
+            Dictionary<string, string> factDict = new Dictionary<string, string>();
+            foreach (var slot in factInstance.GetSlotValues())
+            {
+                factDict[slot.SlotName] = slot.Contents;
+            }
+
+            return factDict;
+        }
+        
         private void resetBtn_Click(object sender, EventArgs e)
         {
             outputBox.Text = "Выполнена команда Reset." + System.Environment.NewLine;
             
             _clips.Reset();
 
+            //_clips.Eval("(assert (used_rule (rule_id dummy)))");
+            
             foreach (string factLine in chosenInputsFactsBox.Text.Split('\n').
                                                                   Select(fline => fline.Trim()).
                                                                   Where(fline => !string.IsNullOrEmpty(fline)))

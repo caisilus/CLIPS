@@ -9,6 +9,7 @@ namespace ProductionSystem
     {
         private readonly Dictionary<string, Fact> _idsToFacts = new Dictionary<string, Fact>();
         private readonly Dictionary<string, Fact> _namesToFacts = new Dictionary<string, Fact>();
+        private readonly Dictionary<string, Rule> _idsToRules = new Dictionary<string, Rule>();
         private readonly string _blocksSeparator;
         private readonly string _conditionAndConsequenceSeparator;
         private readonly string _factTokensSeparator;
@@ -88,9 +89,9 @@ namespace ProductionSystem
         private ProductionSystem CreateProductionSystemFromLines(List<string> factsLines, List<string> rulesLines)
         {
             LoadFacts(factsLines);
-            List<Rule> rules = GetRules(rulesLines);
+            LoadRules(rulesLines);
 
-            return new ProductionSystem(_idsToFacts, _namesToFacts, rules);
+            return new ProductionSystem(_idsToFacts, _namesToFacts, _idsToRules);
         }
 
         private void LoadFacts(List<string> factLines)
@@ -112,9 +113,13 @@ namespace ProductionSystem
             return fact;
         }
         
-        private List<Rule> GetRules(List<string> ruleLines)
+        private void LoadRules(List<string> ruleLines)
         {
-            return ruleLines.Select(CreateRuleFromLine).ToList();
+            foreach (var ruleLine in ruleLines)
+            {
+                var rule = CreateRuleFromLine(ruleLine);
+                _idsToRules[rule.Id] = rule;
+            }
         }
 
         // uses _idsToFacts, so facts should be loaded before

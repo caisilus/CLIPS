@@ -51,18 +51,22 @@ namespace ProductionSystem
         // TODO can be changed for your needs
         public override string ToString()
         {
-            return FactsListToString(Conditions) + "->" + FactsListToString(Consequences);
+            return Id + ":" + Environment.NewLine + FactsListToString(Conditions) + 
+                              Environment.NewLine + "->" + Environment.NewLine + FactsListToString(Consequences);
         }
 
         private string FactsListToString(List<Fact> facts)
         {
-            return string.Join(",", facts);
+            return string.Join("," + Environment.NewLine, facts);
         }
 
         public string ToClipsString()
         {
             var sb = new StringBuilder();
             sb.Append($"(defrule {Id}\n");
+            
+            //sb.Append($"\t?raddr <- (used_rule (rule_id ~{Id}))\n");
+            
             foreach (var condition in Conditions)
             {
                 sb.Append("\t");
@@ -79,6 +83,9 @@ namespace ProductionSystem
                 sb.Append("\n");
             }
 
+            //sb.Append("\t(retract ?raddr)\n");
+            sb.Append($"\t(assert (used_rule (rule_id {Id})))\n");
+            
             sb.Append(")");
             return sb.ToString();
         }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using CLIPSNET;
 
 namespace ProductionSystem
 {
@@ -8,15 +8,18 @@ namespace ProductionSystem
     {
         public Dictionary<string, Fact> IdsToFacts { get; }
         public Dictionary<string, Fact> NamesToFacts { get; }
+        
+        public Dictionary<string, Rule> IdsToRules { get; }
         public List<Rule> Rules { get; }
         
         public ProductionSystem(Dictionary<string, Fact> idsToFacts, 
                                 Dictionary<string, Fact> namesToFacts, 
-                                List<Rule> rules)
+                                Dictionary<string, Rule> idsToRules)
         {
             IdsToFacts = idsToFacts;
             NamesToFacts = namesToFacts;
-            Rules = rules;
+            IdsToRules = idsToRules;
+            Rules = idsToRules.Values.ToList();
         }
 
         public string RulesToClipsText()
