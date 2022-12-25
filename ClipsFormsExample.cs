@@ -171,6 +171,28 @@ namespace ClipsFormsExample
                 Fact fact = _productionSystem.NamesToFacts[factLine];
                 _goals.Add(fact);
             }
+            
+            _clips.LoadFromString(StopOnGoalsRule());
+        }
+
+        private string StopOnGoalsRule()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"(defrule goal_rule");
+            sb.Append(Environment.NewLine);
+            foreach (var goal in _goals)
+            {
+                sb.Append("\t");
+                sb.Append(goal.ToClipsCondition());
+                sb.Append(Environment.NewLine);    
+            }
+
+            sb.Append("=>");
+            sb.Append(Environment.NewLine);
+            sb.Append("\t(halt)");
+            sb.Append(Environment.NewLine);
+            sb.Append(")");
+            return sb.ToString();
         }
 
         private void openFile_Click(object sender, EventArgs e)
