@@ -1,3 +1,13 @@
+(defrule updateConf
+	(declare (salience 110))
+	?f1 <- (fact_entity (id ?id) (name ?name) (confidence ?c1))
+	?f2 <- (fact_entity (id ?id) (name ?name) (confidence ?c2))
+	(test (!= ?c1 ?c2))
+=>
+	(assert (fact_entity (id ?id) (name ?name) (confidence (- (+ ?c1 ?c2) (* ?c1 ?c2)))))
+	(retract ?f1)
+	(retract ?f2)
+)
 (defrule r1
 	(declare (salience 10))
 	(fact_entity (id f46) (name "Твой класс Варвар") (confidence ?f46Conf))
