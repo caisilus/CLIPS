@@ -140,7 +140,10 @@
     <Content Include="clips_files\used_rule_template.clp" />
     <Content Include="storage\facts.txt" />
     <Content Include="storage\Facts_new.txt" />
+    <Content Include="storage\Facts_with_confidence.txt" />
+    <Content Include="storage\filler.py" />
     <Content Include="storage\Rules.txt" />
+    <Content Include="storage\Rules_with_confidence.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
