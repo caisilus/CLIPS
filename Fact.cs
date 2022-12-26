@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ProductionSystem
 {
@@ -24,6 +26,11 @@ namespace ProductionSystem
         public bool isInvert { get; set; }
         
         public string Confidence { get; }
+
+        public string ConfidenceVariableName()
+        {
+            return $"?{Id}Conf";
+        }
 
         public override string ToString()
         {
@@ -51,17 +58,7 @@ namespace ProductionSystem
             return this.Id == fact.Id && this.isInvert == fact.isInvert;
         }
 
-        public string ToClipsCondition()
-        {
-            if (isInvert)
-            {
-                return $"(fact_entity (id ~{Id}) (name ?) (confidence ?))";
-            }
-            
-            return $"(fact_entity (id {Id}) (name \"{Name}\") (confidence {Confidence}))";
-        }
-
-        public string ToClipsConsequence()
+        public string AssertToClipsString()
         {
             if (isInvert)
             {
@@ -69,6 +66,35 @@ namespace ProductionSystem
             }
             
             return $"(assert (fact_entity (id {Id}) (name \"{Name}\") (confidence {Confidence})))";
+        }
+        
+        public string ToClipsCondition()
+        {
+            if (isInvert)
+            {
+                return $"(fact_entity (id ~{Id}) (name \"{Name}\") (confidence {ConfidenceVariableName()}))";
+            }
+            
+            return $"(fact_entity (id {Id}) (name \"{Name}\") (confidence {ConfidenceVariableName()}))";
+        }
+
+        public string ToClipsConsequence(string ruleConfidence, IEnumerable<string> conditionFactsConfidences)
+        {
+            if (isInvert)
+            {
+                throw new ApplicationException("Invert consequence is not allowed");
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"(assert (fact_entity (id {Id}) (name \"{Name}\") (confidence (* {ruleConfidence} (min");
+            foreach (var condFactConfidence in conditionFactsConfidences)
+            {
+                sb.Append(" ");
+                sb.Append(condFactConfidence);
+            }
+
+            sb.Append(")))))"); //:)))))
+            return sb.ToString();
         }
     }
 }

@@ -82,7 +82,8 @@ namespace ProductionSystem
             foreach (var consequence in Consequences)
             {
                 sb.Append("\t");
-                sb.Append(consequence.ToClipsConsequence());
+                sb.Append(consequence.ToClipsConsequence(Confidence, 
+                                      Conditions.Select(cond => cond.ConfidenceVariableName())));
                 sb.Append("\n");
             }
 

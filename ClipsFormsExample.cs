@@ -30,7 +30,7 @@ namespace ClipsFormsExample
             
             File.WriteAllText("../../clips_files/rules.clp", _productionSystem.RulesToClipsText());
             
-            InitClipsData();
+            //InitClipsData();
             
             InitializeComponent();
         }
@@ -166,10 +166,12 @@ namespace ClipsFormsExample
         
         private void resetBtn_Click(object sender, EventArgs e)
         {
-            outputBox.Text = "Выполнена команда Reset." + System.Environment.NewLine;
-            
             _clips.Reset();
+            _clips.Clear();
             
+            outputBox.Text = "Выполнены команды Reset и Clear." + System.Environment.NewLine;
+            
+            InitClipsData();
             LoadStartingFacts();
             UpdateGoals();
         }
@@ -181,8 +183,8 @@ namespace ClipsFormsExample
                 Where(line => !string.IsNullOrEmpty(line)))
             {
                 Fact fact = _productionSystem.NamesToFacts[factLine];
-                var clipsString = fact.ToClipsConsequence();
-                _clips.Eval(fact.ToClipsConsequence());
+                var clipsString = fact.AssertToClipsString();
+                _clips.Eval(clipsString);
             }
         }
 
