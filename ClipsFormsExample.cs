@@ -97,7 +97,7 @@ namespace ClipsFormsExample
                 {
                     case "fact_entity":
                     {
-                        Fact fact = _productionSystem.IdsToFacts[factDict["id"]];
+                        Fact fact = new Fact(factDict["id"], factDict["name"], factDict["confidence"]);
                         deducedFacts.Add(fact);
                         break;   
                     }
@@ -110,6 +110,13 @@ namespace ClipsFormsExample
                 }
             }
 
+            FillOutputHeading(deducedFacts);
+            OutputUsedRules(usedRules);
+            OutputDeducedFacts(deducedFacts);
+        }
+
+        private void FillOutputHeading(HashSet<Fact> deducedFacts)
+        {
             bool reachedGoals = _goals.All(goal => deducedFacts.Contains(goal));
             if (reachedGoals)
             {
@@ -119,13 +126,33 @@ namespace ClipsFormsExample
             {
                 outputBox.Text = "НЕВОЗМОЖНО ВЫВЕСТИ" + Environment.NewLine + "------------------------------";
             }
+        }
 
+        private void OutputUsedRules(List<Rule> usedRules)
+        {
             outputBox.Text += Environment.NewLine;
             outputBox.Text += "ИСПОЛЬЗОВАННЫЕ ПРАВИЛА:" + Environment.NewLine;
             outputBox.Text += Environment.NewLine + 
                               string.Join(Environment.NewLine + Environment.NewLine, usedRules);
         }
-
+        
+        private void OutputDeducedFacts(HashSet<Fact> deducedFacts)
+        {
+            outputBox.Text += Environment.NewLine;
+            outputBox.Text += "ВЫВЕДЕННЫЕ ФАКТЫ:";
+            outputBox.Text += Environment.NewLine;
+            foreach (var fact in deducedFacts)
+            {
+                outputBox.Text += Environment.NewLine;
+                outputBox.Text += "id: ";
+                outputBox.Text += fact.Id;
+                outputBox.Text += " name: ";
+                outputBox.Text += fact.Name;
+                outputBox.Text += " confidence: ";
+                outputBox.Text += fact.Confidence;
+            }
+        }
+        
         private Dictionary<string, string> ClipsFactToDictionary(FactInstance factInstance)
         {
             Dictionary<string, string> factDict = new Dictionary<string, string>();
@@ -153,10 +180,8 @@ namespace ClipsFormsExample
                 Select(line => line.Trim()).
                 Where(line => !string.IsNullOrEmpty(line)))
             {
-                Console.WriteLine(factLine);
                 Fact fact = _productionSystem.NamesToFacts[factLine];
                 var clipsString = fact.ToClipsConsequence();
-                Console.WriteLine(clipsString);
                 _clips.Eval(fact.ToClipsConsequence());
             }
         }
@@ -180,6 +205,8 @@ namespace ClipsFormsExample
             StringBuilder sb = new StringBuilder();
             sb.Append($"(defrule goal_rule");
             sb.Append(Environment.NewLine);
+            sb.Append("\t(declare (salience 100))");
+            sb.Append(Environment.NewLine);
             foreach (var goal in _goals)
             {
                 sb.Append("\t");
@@ -192,6 +219,7 @@ namespace ClipsFormsExample
             sb.Append("\t(halt)");
             sb.Append(Environment.NewLine);
             sb.Append(")");
+            Console.WriteLine(sb.ToString());
             return sb.ToString();
         }
 
