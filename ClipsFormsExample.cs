@@ -39,8 +39,8 @@ namespace ClipsFormsExample
         {
             ProductionSystemFileLoader loader = new ProductionSystemFileLoader();
             string storageFolder = "../../storage/";
-            string factsFile = storageFolder + "Facts_new.txt";
-            string rulesFule = storageFolder + "Rules.txt";
+            string factsFile = storageFolder + "Facts_with_confidence.txt";
+            string rulesFule = storageFolder + "Rules_with_confidence.txt";
             _productionSystem = loader.LoadFromFiles(factsFile, rulesFule);
         }
         

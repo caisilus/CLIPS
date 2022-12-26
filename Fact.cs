@@ -4,16 +4,17 @@ namespace ProductionSystem
 {
     public class Fact
     {
-        public Fact(string id, string name)
+        public Fact(string id, string name, string confidence)
         {
             Id = id;
             Name = name;
             isInvert = false;
+            Confidence = confidence;
         }
 
         public Fact clone()
         {
-            return new Fact(Id, Name);
+            return new Fact(Id, Name, Confidence);
         }
 
         public string Id { get; }
@@ -21,6 +22,8 @@ namespace ProductionSystem
         public string Name { get; }
 
         public bool isInvert { get; set; }
+        
+        public string Confidence { get; }
 
         public override string ToString()
         {
@@ -52,10 +55,10 @@ namespace ProductionSystem
         {
             if (isInvert)
             {
-                return $"(fact_entity (id ~{Id}) (name _))";
+                return $"(fact_entity (id ~{Id}) (name ?) (confidence ?))";
             }
             
-            return $"(fact_entity (id {Id}) (name \"{Name}\"))";
+            return $"(fact_entity (id {Id}) (name \"{Name}\") (confidence {Confidence}))";
         }
 
         public string ToClipsConsequence()
@@ -65,7 +68,7 @@ namespace ProductionSystem
                 throw new ApplicationException("Invert consequence is not allowed");
             }
             
-            return $"(assert (fact_entity (id {Id}) (name \"{Name}\")))";
+            return $"(assert (fact_entity (id {Id}) (name \"{Name}\") (confidence {Confidence})))";
         }
     }
 }

@@ -10,12 +10,15 @@ namespace ProductionSystem
         public string Id { get; private set; }
         public List<Fact> Conditions { get; private set; }
         public List<Fact> Consequences { get; private set; }
+        
+        public string Confidence { get; private set; }
 
-        public Rule(int id, List<Fact> conditions, List<Fact> consequences)
+        public Rule(int id, List<Fact> conditions, List<Fact> consequences, string confidence)
         {
             Id = $"r{id}";
             Conditions = conditions;
             Consequences = consequences;
+            Confidence = confidence;
         }
 
         public bool IsApplicable(HashSet<Fact> facts)

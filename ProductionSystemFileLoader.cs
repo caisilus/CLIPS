@@ -109,7 +109,8 @@ namespace ProductionSystem
             string[] tokens = factLine.Split(new [] {_factTokensSeparator}, StringSplitOptions.RemoveEmptyEntries);
             string id = tokens[0];
             string name = tokens[1];
-            Fact fact = new Fact(id, name);
+            string confidence = tokens[2];
+            Fact fact = new Fact(id, name, confidence);
             return fact;
         }
         
@@ -125,7 +126,10 @@ namespace ProductionSystem
         // uses _idsToFacts, so facts should be loaded before
         private Rule CreateRuleFromLine(string ruleLine)
         {
-            string[] tokens = ruleLine.Split(new [] {_conditionAndConsequenceSeparator}, StringSplitOptions.RemoveEmptyEntries);
+            string[] tokens = ruleLine.Split(new[] {_factTokensSeparator}, StringSplitOptions.RemoveEmptyEntries);
+            string rule = tokens[0];
+            string confidence = tokens[1];
+            tokens = rule.Split(new [] {_conditionAndConsequenceSeparator}, StringSplitOptions.RemoveEmptyEntries);
             
             ValidateRuleTokens(tokens);
             
@@ -135,7 +139,7 @@ namespace ProductionSystem
             string rightSide = tokens[1];
             List<Fact> consequences = FactsFromEnumeration(rightSide);
             
-            return new Rule(_lastRuleId++, conditions, consequences);
+            return new Rule(_lastRuleId++, conditions, consequences, confidence);
         }
 
         private void ValidateRuleTokens(string[] tokens)
