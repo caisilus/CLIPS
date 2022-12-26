@@ -151,16 +151,17 @@ namespace ProductionSystem
 
         private List<Fact> FactsFromEnumeration(string factsEnumeration)
         {
-            return FactIdsFromEnumeration(factsEnumeration).Select(HandleFactId).ToList();
+            return FactIdsFromEnumeration(factsEnumeration).Select(HandleFactId).Where(f=>f != null).ToList();
         }
         
         private Fact HandleFactId(string factId)
         {
             if (factId[0] == '!')
             {
-                Fact fact = _idsToFacts[factId.Substring(1)].clone();
+                return null;
+                /*Fact fact = _idsToFacts[factId.Substring(1)].clone();
                 fact.isInvert = true;
-                return fact;
+                return fact;*/
             }
                 
             return _idsToFacts[factId];
