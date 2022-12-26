@@ -67,7 +67,7 @@ namespace ProductionSystem
         {
             var sb = new StringBuilder();
             sb.Append($"(defrule {Id}\n");
-            
+            sb.Append("\t(declare (salience 10))\n");
             //sb.Append($"\t?raddr <- (used_rule (rule_id ~{Id}))\n");
             
             foreach (var condition in Conditions)
